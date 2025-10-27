@@ -2,6 +2,7 @@ package zgen
 
 import (
   "fmt"
+  "math"
   "testing"
   "time"
 
@@ -401,6 +402,22 @@ func Test_Int8(t *testing.T) {
     assert.Equal(t, int8(0), res)
   }
 
+  // Test complex number overflow
+  _, err := Int8(complex64(math.MaxInt8 + 1 + 0i))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+  _, err = Int8(complex64(math.MinInt8 - 1 + 0i))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Int8(complex128(math.MaxInt8 + 1 + 0i))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Int8(complex128(math.MinInt8 - 1 + 0i))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
   if res, err := Int8(time.Duration(5)); err != nil {
     t.Error(err)
   } else {
@@ -429,7 +446,7 @@ func Test_Int8(t *testing.T) {
   }
 
   // this conversion will lose the data because we are converting an int64 to int8
-  if res, err := Int8(9223372036854775807); err != nil {
+  if res, err := Int8(math.MaxInt16); err != nil {
     assert.Equal(t, int8(0), res)
     assert.Equal(t, ErrorConvertorNumberOverflow, err.Get().Code())
   } else {
@@ -522,6 +539,24 @@ func Test_Int16(t *testing.T) {
   } else {
     assert.Equal(t, int16(0), res)
   }
+
+  // Test complex number overflow
+  _, err := Int16(complex64(math.MaxInt16 + 1 + 0i))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Int16(complex64(math.MinInt16 - 1 + 0i))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Int16(complex128(math.MaxInt16 + 1 + 0i))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Int16(complex128(math.MinInt16 - 1 + 0i))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
   if res, err := Int16([]byte{49, 48, 46, 48, 48, 48, 48, 48, 48, 48, 48}); err != nil {
     t.Error(err)
   } else {
@@ -533,12 +568,46 @@ func Test_Int16(t *testing.T) {
     assert.Equal(t, int16(5), res)
   }
 
-  // this conversion will lose the data because we are converting an int64 to int16
-  if res, err := Int16(9223372036854775807); err != nil {
-    t.Error(err)
-  } else {
-    assert.Equal(t, int16(-1), res)
-  }
+  // Test overflow cases for Int16
+  _, err = Int16(int64(math.MaxInt16 + 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Int16(int64(math.MinInt16 - 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Int16(uint16(math.MaxInt16 + 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Int16(uint32(math.MaxInt16 + 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Int16(uint64(math.MaxInt16 + 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Int16(float32(math.MaxInt16 + 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Int16(float32(math.MinInt16 - 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Int16(float64(math.MaxInt16 + 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Int16(float64(math.MinInt16 - 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Int16(math.NaN())
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
 
   if _, err := Int16([]string{}); err == nil {
     t.Error("Should trigger an error")
@@ -610,6 +679,14 @@ func Test_Int32(t *testing.T) {
     assert.Equal(t, int32(0), res)
   }
 
+  _, err := Int32(complex128(math.MaxInt32 + 1 + 0i))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Int32(complex128(math.MinInt32 - 1 + 0i))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
   if res, err := Int32(time.Duration(5)); err != nil {
     t.Error(err)
   } else {
@@ -637,12 +714,26 @@ func Test_Int32(t *testing.T) {
     assert.Equal(t, int32(5), res)
   }
 
-  // this conversion will lose the data because we are converting an int64 to int32
-  if res, err := Int32(9223372036854775807); err != nil {
-    t.Error(err)
-  } else {
-    assert.Equal(t, int32(-1), res)
-  }
+  // Test overflow cases
+  _, err = Int32(int64(math.MaxInt32 + 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Int32(int64(math.MinInt32 - 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Int32(uint64(math.MaxInt32 + 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Int32(math.MaxFloat64)
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Int32(math.NaN())
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
 
   if _, err := Int32([]string{}); err == nil {
     t.Error("Should trigger an error")
@@ -816,6 +907,24 @@ func Test_Uint8(t *testing.T) {
   } else {
     assert.Equal(t, uint8(0), res)
   }
+
+  // Test complex number overflow
+  _, err := Uint8(complex64(math.MaxUint8 + 1 + 0i))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint8(complex64(-1 + 0i))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint8(complex128(math.MaxUint8 + 1 + 0i))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint8(complex128(-1 + 0i))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
   if res, err := Uint8(time.Duration(5)); err != nil {
     t.Error(err)
   } else {
@@ -842,6 +951,51 @@ func Test_Uint8(t *testing.T) {
   } else {
     assert.Equal(t, uint8(5), res)
   }
+
+  // Test overflow cases for Uint8
+  _, err = Uint8(-1)
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint8(int8(-1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint8(int16(math.MaxUint8 + 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint8(int32(math.MaxUint8 + 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint8(int64(math.MaxUint8 + 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint8(uint16(math.MaxUint8 + 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint8(uint32(math.MaxUint8 + 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint8(uint64(math.MaxUint8 + 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint8(float32(math.MaxUint8 + 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint8(float64(math.MaxUint8 + 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint8(math.NaN())
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
 
   if _, err := Uint8([]string{}); err == nil {
     t.Error("Should trigger an error")
@@ -912,6 +1066,24 @@ func Test_Uint16(t *testing.T) {
   } else {
     assert.Equal(t, uint16(0), res)
   }
+
+  // Test complex number overflow
+  _, err := Uint16(complex64(math.MaxUint16 + 1 + 0i))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint16(complex64(-1 + 0i))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint16(complex128(math.MaxUint16 + 1 + 0i))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint16(complex128(-1 + 0i))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
   if res, err := Uint16(time.Duration(5)); err != nil {
     t.Error(err)
   } else {
@@ -938,6 +1110,43 @@ func Test_Uint16(t *testing.T) {
   } else {
     assert.Equal(t, uint16(5), res)
   }
+
+  // Test overflow cases for Uint16
+  _, err = Uint16(-1)
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint16(int16(-1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint16(int32(math.MaxUint16 + 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint16(int64(math.MaxUint16 + 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint16(uint32(math.MaxUint16 + 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint16(uint64(math.MaxUint16 + 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint16(float32(math.MaxUint16 + 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint16(float64(math.MaxUint16 + 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint16(math.NaN())
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
 
   if _, err := Uint16([]string{}); err == nil {
     t.Error("Should trigger an error")
@@ -1008,6 +1217,19 @@ func Test_Uint32(t *testing.T) {
   } else {
     assert.Equal(t, uint32(0), res)
   }
+
+  _, err := Uint32(complex64(-1 + 0i))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint32(complex128(math.MaxUint32 + 1 + 0i))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint32(complex128(-1 + 0i))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
   if res, err := Uint32(time.Duration(5)); err != nil {
     t.Error(err)
   } else {
@@ -1034,6 +1256,31 @@ func Test_Uint32(t *testing.T) {
   } else {
     assert.Equal(t, uint32(5), res)
   }
+
+  // Test overflow cases for Uint32
+  _, err = Uint32(-1)
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint32(int32(-1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint32(int64(math.MaxUint32 + 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint32(uint64(math.MaxUint32 + 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint32(float64(math.MaxUint32 + 1))
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
+
+  _, err = Uint32(math.NaN())
+  assert.Error(t, err)
+  assert.True(t, err.Has(ErrorConvertorNumberOverflow))
 
   if _, err := Uint32([]string{}); err == nil {
     t.Error("Should trigger an error")
