@@ -125,7 +125,7 @@ func Test_Bool(t *testing.T) {
   if _, err := Bool([]string{}); err == nil {
     t.Error("Should trigger an error")
   } else {
-    assert.Equal(t, ErrorZGENConvertorTypeNotSupported, err.Error())
+    assert.Equal(t, ErrorConvertorTypeNotSupported, err.Error())
   }
 }
 
@@ -229,7 +229,7 @@ func Test_Uint(t *testing.T) {
   if _, err := Uint([]string{}); err == nil {
     t.Error("Should trigger an error")
   } else {
-    assert.Equal(t, ErrorZGENConvertorTypeNotSupported, err.Error())
+    assert.Equal(t, ErrorConvertorTypeNotSupported, err.Error())
   }
 }
 
@@ -334,7 +334,7 @@ func Test_Int(t *testing.T) {
   if _, err := Int([]string{}); err == nil {
     t.Error("Should trigger an error")
   } else {
-    assert.Equal(t, ErrorZGENConvertorTypeNotSupported, err.Error())
+    assert.Equal(t, ErrorConvertorTypeNotSupported, err.Error())
   }
 }
 
@@ -428,9 +428,10 @@ func Test_Int8(t *testing.T) {
     assert.Equal(t, int8(5), res)
   }
 
-  //this conversion will lose the data because we are converting an int64 to int8
+  // this conversion will lose the data because we are converting an int64 to int8
   if res, err := Int8(9223372036854775807); err != nil {
-    t.Error(err)
+    assert.Equal(t, int8(0), res)
+    assert.Equal(t, ErrorConvertorNumberOverflow, err.Get().Code())
   } else {
     assert.Equal(t, int8(-1), res)
   }
@@ -438,7 +439,7 @@ func Test_Int8(t *testing.T) {
   if _, err := Int8([]string{}); err == nil {
     t.Error("Should trigger an error")
   } else {
-    assert.Equal(t, ErrorZGENConvertorTypeNotSupported, err.Error())
+    assert.Equal(t, ErrorConvertorTypeNotSupported, err.Error())
   }
 }
 
@@ -532,7 +533,7 @@ func Test_Int16(t *testing.T) {
     assert.Equal(t, int16(5), res)
   }
 
-  //this conversion will lose the data because we are converting an int64 to int16
+  // this conversion will lose the data because we are converting an int64 to int16
   if res, err := Int16(9223372036854775807); err != nil {
     t.Error(err)
   } else {
@@ -542,7 +543,7 @@ func Test_Int16(t *testing.T) {
   if _, err := Int16([]string{}); err == nil {
     t.Error("Should trigger an error")
   } else {
-    assert.Equal(t, ErrorZGENConvertorTypeNotSupported, err.Error())
+    assert.Equal(t, ErrorConvertorTypeNotSupported, err.Error())
   }
 }
 
@@ -636,7 +637,7 @@ func Test_Int32(t *testing.T) {
     assert.Equal(t, int32(5), res)
   }
 
-  //this conversion will lose the data because we are converting an int64 to int32
+  // this conversion will lose the data because we are converting an int64 to int32
   if res, err := Int32(9223372036854775807); err != nil {
     t.Error(err)
   } else {
@@ -646,7 +647,7 @@ func Test_Int32(t *testing.T) {
   if _, err := Int32([]string{}); err == nil {
     t.Error("Should trigger an error")
   } else {
-    assert.Equal(t, ErrorZGENConvertorTypeNotSupported, err.Error())
+    assert.Equal(t, ErrorConvertorTypeNotSupported, err.Error())
   }
 }
 
@@ -739,7 +740,7 @@ func Test_Int64(t *testing.T) {
   } else {
     assert.Equal(t, int64(5), res)
   }
-  //this conversion should work
+  // this conversion should work
   if res, err := Int64(9223372036854775807); err != nil {
     t.Error(err)
   } else {
@@ -749,7 +750,7 @@ func Test_Int64(t *testing.T) {
   if _, err := Int64([]string{}); err == nil {
     t.Error("Should trigger an error")
   } else {
-    assert.Equal(t, ErrorZGENConvertorTypeNotSupported, err.Error())
+    assert.Equal(t, ErrorConvertorTypeNotSupported, err.Error())
   }
 }
 
@@ -845,7 +846,7 @@ func Test_Uint8(t *testing.T) {
   if _, err := Uint8([]string{}); err == nil {
     t.Error("Should trigger an error")
   } else {
-    assert.Equal(t, ErrorZGENConvertorTypeNotSupported, err.Error())
+    assert.Equal(t, ErrorConvertorTypeNotSupported, err.Error())
   }
 }
 
@@ -941,7 +942,7 @@ func Test_Uint16(t *testing.T) {
   if _, err := Uint16([]string{}); err == nil {
     t.Error("Should trigger an error")
   } else {
-    assert.Equal(t, ErrorZGENConvertorTypeNotSupported, err.Error())
+    assert.Equal(t, ErrorConvertorTypeNotSupported, err.Error())
   }
 }
 
@@ -1037,7 +1038,7 @@ func Test_Uint32(t *testing.T) {
   if _, err := Uint32([]string{}); err == nil {
     t.Error("Should trigger an error")
   } else {
-    assert.Equal(t, ErrorZGENConvertorTypeNotSupported, err.Error())
+    assert.Equal(t, ErrorConvertorTypeNotSupported, err.Error())
   }
 }
 
@@ -1133,7 +1134,7 @@ func Test_Uint64(t *testing.T) {
   if _, err := Uint64([]string{}); err == nil {
     t.Error("Should trigger an error")
   } else {
-    assert.Equal(t, ErrorZGENConvertorTypeNotSupported, err.Error())
+    assert.Equal(t, ErrorConvertorTypeNotSupported, err.Error())
   }
 }
 
@@ -1244,7 +1245,7 @@ func Test_Float32(t *testing.T) {
   if _, err := Float32([]string{}); err == nil {
     t.Error("Should trigger an error")
   } else {
-    assert.Equal(t, ErrorZGENConvertorTypeNotSupported, err.Error())
+    assert.Equal(t, ErrorConvertorTypeNotSupported, err.Error())
   }
 }
 
@@ -1355,7 +1356,7 @@ func Test_Float64(t *testing.T) {
   if _, err := Float64([]string{}); err == nil {
     t.Error("Should trigger an error")
   } else {
-    assert.Equal(t, ErrorZGENConvertorTypeNotSupported, err.Error())
+    assert.Equal(t, ErrorConvertorTypeNotSupported, err.Error())
   }
 }
 
@@ -1489,7 +1490,7 @@ func Test_Decimal(t *testing.T) {
   if _, err := Decimal([]string{}); err == nil {
     t.Error("Should trigger an error")
   } else {
-    assert.Equal(t, ErrorZGENConvertorTypeNotSupported, err.Error())
+    assert.Equal(t, ErrorConvertorTypeNotSupported, err.Error())
   }
 }
 
@@ -1606,7 +1607,7 @@ func Test_Complex64(t *testing.T) {
   if _, err := Complex64([]string{}); err == nil {
     t.Error("Should trigger an error")
   } else {
-    assert.Equal(t, ErrorZGENConvertorTypeNotSupported, err.Error())
+    assert.Equal(t, ErrorConvertorTypeNotSupported, err.Error())
   }
 }
 
@@ -1723,7 +1724,7 @@ func Test_Complex128(t *testing.T) {
   if _, err := Complex128([]string{}); err == nil {
     t.Error("Should trigger an error")
   } else {
-    assert.Equal(t, ErrorZGENConvertorTypeNotSupported, err.Error())
+    assert.Equal(t, ErrorConvertorTypeNotSupported, err.Error())
   }
 }
 
@@ -1836,7 +1837,7 @@ func Test_String(t *testing.T) {
   } else {
     assert.Equal(t, "5", res)
   }
-  if res, err := String([]byte{53}); err != nil { //53 is the ascii for 5
+  if res, err := String([]byte{53}); err != nil { // 53 is the ascii for 5
     t.Error(err)
   } else {
     assert.Equal(t, "5", res)
@@ -1851,26 +1852,26 @@ func Test_String(t *testing.T) {
   if _, err := String([]string{}); err == nil {
     t.Error("Should trigger an error")
   } else {
-    assert.Equal(t, ErrorZGENConvertorTypeNotSupported, err.Error())
+    assert.Equal(t, ErrorConvertorTypeNotSupported, err.Error())
   }
 }
 
 func Test_MapStringAny(t *testing.T) {
-  //Type not supported error
+  // Type not supported error
   if _, err := MapStringAny("value"); err == nil {
     t.Error("Should trigger an error")
   } else {
-    assert.Contains(t, err.Error(), ErrorZGENConvertorTypeNotSupported)
+    assert.Contains(t, err.Error(), ErrorConvertorTypeNotSupported)
   }
 
-  //Key type not supported
-  type TestStruct struct { //struct that has no Stringable function associated so the conversion will fail
+  // Key type not supported
+  type TestStruct struct { // struct that has no Stringable function associated so the conversion will fail
     Key string
   }
   if _, err := MapStringAny(map[TestStruct]string{TestStruct{"key"}: "value"}); err == nil {
     t.Error("Should trigger an error")
   } else {
-    assert.Equal(t, ErrorZGENConvertorTypeNotSupported, err.Error())
+    assert.Equal(t, ErrorConvertorTypeNotSupported, err.Error())
   }
 
   mii := map[int]int{1: 1, 2: 2, 3: 3}
@@ -1888,12 +1889,12 @@ func Test_MapStringAny(t *testing.T) {
     assert.Equal(t, miiconverted, convResult)
   }
 
-  //if convResult, err := MapStringAny(&msi); err != nil {
+  // if convResult, err := MapStringAny(&msi); err != nil {
   //  fmt.Printf("err: %#v\n", err.GetList()[0].Get())
   //  t.Error(err)
-  //} else {
+  // } else {
   //  assert.Equal(t, msi, convResult)
-  //}
+  // }
 
 }
 
@@ -1936,7 +1937,7 @@ func Test_SliceError(t *testing.T) {
     t.Error("Should Error")
   }
 
-  assert.Equal(t, ErrorZGENConvertorTypeNotSupported, err.Error())
+  assert.Equal(t, ErrorConvertorTypeNotSupported, err.Error())
 }
 
 func Test_SliceString(t *testing.T) {
@@ -1970,7 +1971,7 @@ func Test_SliceStringError(t *testing.T) {
     t.Error("Should Error")
   }
 
-  assert.Equal(t, ErrorZGENConvertorTypeNotSupported, err.Error())
+  assert.Equal(t, ErrorConvertorTypeNotSupported, err.Error())
 
   si2 := []interface{}{"1", []string{"x", "y"}}
 
@@ -1979,7 +1980,7 @@ func Test_SliceStringError(t *testing.T) {
     t.Error("Should Error")
   }
 
-  assert.Equal(t, ErrorZGENConvertorTypeNotSupported, err.Error())
+  assert.Equal(t, ErrorConvertorTypeNotSupported, err.Error())
 }
 
 func Test_SliceInt(t *testing.T) {
@@ -2001,7 +2002,7 @@ func Test_SliceIntError(t *testing.T) {
     t.Error("Should Error")
   }
 
-  assert.Equal(t, ErrorZGENConvertorTypeNotSupported, err.Error())
+  assert.Equal(t, ErrorConvertorTypeNotSupported, err.Error())
 
   si2 := []interface{}{"1", []string{"x", "y"}}
 
@@ -2010,10 +2011,10 @@ func Test_SliceIntError(t *testing.T) {
     t.Error("Should Error")
   }
 
-  assert.Equal(t, ErrorZGENConvertorTypeNotSupported, err.Error())
+  assert.Equal(t, ErrorConvertorTypeNotSupported, err.Error())
 }
 
-//func Test_SliceMapStringAny(t *testing.T) {
+// func Test_SliceMapStringAny(t *testing.T) {
 //  type TestStruct struct {
 //    Key   string `json:"Key"`
 //    Value string `json:"Value"`
@@ -2035,7 +2036,7 @@ func Test_SliceIntError(t *testing.T) {
 //
 //  assert.Equal(t, "testMapKey", res[0]["Key"])
 //  assert.Equal(t, "testStructKey", res[1]["Key"])
-//}
+// }
 
 func TestUnit_Time(t *testing.T) {
   currTime := time.Now().UTC()
@@ -2114,10 +2115,10 @@ func TestUnit_Time(t *testing.T) {
     t.Error(zerr)
   }
 
-  floatTime, _ := dec.Float64() //this will not be exact no matter what we do
+  floatTime, _ := dec.Float64() // this will not be exact no matter what we do
   res, zerr = Time(floatTime)
   if zerr != nil {
     t.Error(zerr)
   }
-  assert.Equal(t, res.UTC().Format(time.RFC3339), currTime.Format(time.RFC3339)) //testing only up to seconds
+  assert.Equal(t, res.UTC().Format(time.RFC3339), currTime.Format(time.RFC3339)) // testing only up to seconds
 }

@@ -18,6 +18,8 @@ vendor
 # JetBrains IDE files
 .idea/
 
+.continue/
+
 # Vim swap files
 *.swp
 *.swo
