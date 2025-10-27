@@ -34,9 +34,6 @@ num, err := zgen.Int("42") // 42, nil
 // Float to string
 str, err := zgen.String(3.14) // "3.14", nil
 
-// Map to JSON string
-m := map[string]any{"key": "value"}
-jsonStr, err := zgen.String(m) // "{"key":"value"}", nil
 ```
 
 ### Deep Copy
