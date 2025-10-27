@@ -20,6 +20,13 @@ func Int(src any) (dst int, err zerror.Error) {
   case int:
     return val, nil
   case int64:
+    if val > int64(math.MaxInt) || val < int64(math.MinInt) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "int64",
+        "to_type":   "int",
+        "value":     val,
+      })
+    }
     return int(val), nil
   case int8:
     return int(val), nil
@@ -28,18 +35,67 @@ func Int(src any) (dst int, err zerror.Error) {
   case int32:
     return int(val), nil
   case uint:
+    if uint64(val) > uint64(math.MaxInt) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "uint",
+        "to_type":   "int",
+        "value":     val,
+      })
+    }
     return int(val), nil
   case uint8:
     return int(val), nil
   case uint16:
     return int(val), nil
   case uint32:
+    if uint64(val) > uint64(math.MaxInt) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "uint32",
+        "to_type":   "int",
+        "value":     val,
+      })
+    }
     return int(val), nil
   case uint64:
+    if val > uint64(math.MaxInt) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "uint64",
+        "to_type":   "int",
+        "value":     val,
+      })
+    }
     return int(val), nil
   case float32:
+    if math.IsNaN(float64(val)) || math.IsInf(float64(val), 0) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "float32",
+        "to_type":   "int",
+        "value":     val,
+      })
+    }
+    if val > float32(math.MaxInt) || val < float32(math.MinInt) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "float32",
+        "to_type":   "int",
+        "value":     val,
+      })
+    }
     return int(val), nil
   case float64:
+    if math.IsNaN(val) || math.IsInf(val, 0) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "float64",
+        "to_type":   "int",
+        "value":     val,
+      })
+    }
+    if val > float64(math.MaxInt) || val < float64(math.MinInt) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "float64",
+        "to_type":   "int",
+        "value":     val,
+      })
+    }
     return int(val), nil
   case complex64:
     realVal := real(val)
@@ -124,14 +180,49 @@ func Uint(src any) (dst uint, err zerror.Error) {
   case uint:
     return val, nil
   case int:
+    if val < 0 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "int",
+        "to_type":   "uint",
+        "value":     val,
+      })
+    }
     return uint(val), nil
   case int64:
+    if val < 0 || uint64(val) > uint64(math.MaxUint) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "int64",
+        "to_type":   "uint",
+        "value":     val,
+      })
+    }
     return uint(val), nil
   case int8:
+    if val < 0 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "int8",
+        "to_type":   "uint",
+        "value":     val,
+      })
+    }
     return uint(val), nil
   case int16:
+    if val < 0 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "int16",
+        "to_type":   "uint",
+        "value":     val,
+      })
+    }
     return uint(val), nil
   case int32:
+    if val < 0 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "int32",
+        "to_type":   "uint",
+        "value":     val,
+      })
+    }
     return uint(val), nil
   case uint8:
     return uint(val), nil
@@ -140,10 +231,45 @@ func Uint(src any) (dst uint, err zerror.Error) {
   case uint32:
     return uint(val), nil
   case uint64:
+    if val > uint64(math.MaxUint) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "uint64",
+        "to_type":   "uint",
+        "value":     val,
+      })
+    }
     return uint(val), nil
   case float32:
+    if math.IsNaN(float64(val)) || math.IsInf(float64(val), 0) || val < 0 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "float32",
+        "to_type":   "uint",
+        "value":     val,
+      })
+    }
+    if val > float32(math.MaxUint) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "float32",
+        "to_type":   "uint",
+        "value":     val,
+      })
+    }
     return uint(val), nil
   case float64:
+    if math.IsNaN(val) || math.IsInf(val, 0) || val < 0 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "float64",
+        "to_type":   "uint",
+        "value":     val,
+      })
+    }
+    if val > float64(math.MaxUint) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "float64",
+        "to_type":   "uint",
+        "value":     val,
+      })
+    }
     return uint(val), nil
   case complex64:
     realVal := real(val)
