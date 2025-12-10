@@ -13,6 +13,9 @@ const (
   ErrorZGENScannerEvaluate            = "ERROR_ZGEN_SCANNER_EVALUATE"
   ErrorZGENScannerDstStructureInvalid = "ERROR_ZGEN_SCANNER_DST_STRUCTURE_INVALID"
   ErrorZGENScannerArgumentInvalid     = "ERROR_ZGEN_SCANNER_ARGUMENT_INVALID"
+  ErrorZGENScannerFailed              = "ERROR_ZGEN_SCANNER_FAILED"
+
+  ErrorZGENInvalidField = "ERROR_ZGEN_INVALID_FIELD"
 )
 
 // ErrorMap - main error definition map
@@ -39,6 +42,15 @@ var ErrorMap = map[string]errormessage.Message{
   ErrorZGENScannerArgumentInvalid: {
     Code: ErrorZGENScannerArgumentInvalid,
     Msg:  "zgen.Scanner: Argument to assign is Invalid",
+  },
+  ErrorZGENScannerFailed: {
+    Code: ErrorZGENScannerFailed,
+    Msg:  "zgen.Scanner: Failed to scan value",
+  },
+
+  ErrorZGENInvalidField: {
+    Code: ErrorZGENInvalidField,
+    Msg:  "zgen: Invalid field",
   },
 }
 

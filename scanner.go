@@ -55,8 +55,7 @@ func ToMap(destMap any, args ...any) (err zerror.Error) {
         for i := 0; i < elemVal.NumField(); i++ {
           // add field Name to the map if configured
           fieldName := elemVal.Type().Field(i).Name
-          // TODO replace with elemVal.Field(i).PkgPath != "" or elemVal.Field(i).IsExported() (as available) when upgrading to a higher go version since this is not available in 1.12
-          if fieldName[0:1] != strings.ToUpper(fieldName[0:1]) { // test if field name starts with small case = UNEXPORTED so we will ignore it since it will cause errors later on
+          if !elemVal.Type().Field(i).IsExported() { // ignore unexported fields
             continue
           }
 

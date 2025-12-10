@@ -132,7 +132,15 @@ func Int(src any) (dst int, err zerror.Error) {
     }
     return int(realVal), nil
   case time.Duration:
-    return int(val), nil
+    ival := int64(val)
+    if ival > int64(math.MaxInt) || ival < int64(math.MinInt) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "time.Duration",
+        "to_type":   "int",
+        "value":     val,
+      })
+    }
+    return int(ival), nil
   case time.Time: // return the unix value
     return int(val.Unix()), nil
   case bool:
@@ -176,6 +184,7 @@ func Uint(src any) (dst uint, err zerror.Error) {
   if src == nil {
     return 0, nil
   }
+
   switch val := src.(type) {
   case uint:
     return val, nil
@@ -306,7 +315,15 @@ func Uint(src any) (dst uint, err zerror.Error) {
     }
     return uint(realVal), nil
   case time.Duration:
-    return uint(val), nil
+    ival := int64(val)
+    if ival < 0 || uint64(val) > math.MaxUint {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "time.Duration",
+        "to_type":   "uint",
+        "value":     val,
+      })
+    }
+    return uint(ival), nil
   case time.Time: // return the unix value
     return uint(val.Unix()), nil
   case bool:
@@ -333,6 +350,13 @@ func Uint(src any) (dst uint, err zerror.Error) {
         "src_type": "string",
         "dst_type": "uint",
         "error":    err.Error(),
+      })
+    }
+    if floatVal < 0 || floatVal > math.MaxUint {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "string",
+        "to_type":   "uint",
+        "value":     val,
       })
     }
     return uint(floatVal), nil
@@ -389,27 +413,35 @@ func Int64(src any) (dst int64, err zerror.Error) {
     }
     return 0, nil
   case []byte:
-    floatVal, err := strconv.ParseFloat(string(val), 64)
-    if err != nil {
-      return 0, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
-        "src":      val,
-        "src_type": "[]byte",
-        "dst_type": "int64",
-        "error":    err.Error(),
-      })
+    intVal, er := strconv.ParseInt(string(val), 10, 64)
+    if er != nil {
+      floatVal, er := strconv.ParseFloat(string(val), 64)
+      if er != nil {
+        return 0, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
+          "src":      val,
+          "src_type": "[]byte",
+          "dst_type": "int64",
+          "error":    er.Error(),
+        })
+      }
+      return int64(floatVal), nil
     }
-    return int64(floatVal), nil
+    return intVal, nil
   case string:
-    floatVal, err := strconv.ParseFloat(val, 64)
-    if err != nil {
-      return 0, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
-        "src":      val,
-        "src_type": "string",
-        "dst_type": "int64",
-        "error":    err.Error(),
-      })
+    intVal, er := strconv.ParseInt(val, 10, 64)
+    if er != nil {
+      floatVal, er := strconv.ParseFloat(val, 64)
+      if er != nil {
+        return 0, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
+          "src":      val,
+          "src_type": "string",
+          "dst_type": "int64",
+          "error":    er.Error(),
+        })
+      }
+      return int64(floatVal), nil
     }
-    return int64(floatVal), nil
+    return intVal, nil
   default:
     return 0, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
       "src":      val,
@@ -543,7 +575,15 @@ func Int32(src any) (dst int32, err zerror.Error) {
     }
     return int32(realVal), nil
   case time.Duration:
-    return int32(val), nil
+    ival := int64(val)
+    if ival > int64(math.MaxInt32) || ival < int64(math.MinInt32) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "time.Duration",
+        "to_type":   "int32",
+        "value":     val,
+      })
+    }
+    return int32(ival), nil
   case time.Time: // return the unix value, some conversion loss may occur
     return int32(val.Unix()), nil
   case bool:
@@ -570,6 +610,13 @@ func Int32(src any) (dst int32, err zerror.Error) {
         "src_type": "string",
         "dst_type": "int32",
         "error":    err.Error(),
+      })
+    }
+    if floatVal > float64(math.MaxInt32) || floatVal < float64(math.MinInt32) || math.IsNaN(floatVal) || math.IsInf(floatVal, 0) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "string",
+        "to_type":   "int32",
+        "value":     val,
       })
     }
     return int32(floatVal), nil
@@ -724,7 +771,15 @@ func Int16(src any) (dst int16, err zerror.Error) {
     }
     return int16(realVal), nil
   case time.Duration:
-    return int16(val), nil
+    ival := int64(val)
+    if ival > int64(math.MaxInt16) || ival < int64(math.MinInt16) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "time.Duration",
+        "to_type":   "int16",
+        "value":     val,
+      })
+    }
+    return int16(ival), nil
   case time.Time: // return the unix value
     return int16(val.Unix()), nil
   case bool:
@@ -751,6 +806,13 @@ func Int16(src any) (dst int16, err zerror.Error) {
         "src_type": "string",
         "dst_type": "int16",
         "error":    err.Error(),
+      })
+    }
+    if floatVal > float64(math.MaxInt16) || floatVal < float64(math.MinInt16) || math.IsNaN(floatVal) || math.IsInf(floatVal, 0) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "time.Duration",
+        "to_type":   "int16",
+        "value":     val,
       })
     }
     return int16(floatVal), nil
@@ -917,16 +979,15 @@ func Int8(src any) (dst int8, err zerror.Error) {
     }
     return
   case time.Duration:
-    dst = int8(val)
-    if val > math.MaxInt8 || val < math.MinInt8 {
-      err = zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+    ival := int64(val)
+    if ival > int64(math.MaxInt8) || ival < int64(math.MinInt8) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
         "from_type": "time.Duration",
         "to_type":   "int8",
         "value":     val,
       })
-      dst = 0
     }
-    return
+    return int8(ival), nil
   case time.Time: // return the unix value
     rVal := val.Unix()
     dst = int8(rVal)
@@ -975,16 +1036,14 @@ func Int8(src any) (dst int8, err zerror.Error) {
         "error":    er.Error(),
       })
     }
-    dst = int8(floatVal)
-    if floatVal > math.MaxInt8 || floatVal < math.MinInt8 {
-      err = zerror.New(ErrorConvertorNumberOverflow, map[string]any{
-        "from_type": "string",
+    if floatVal > float64(math.MaxInt8) || floatVal < float64(math.MinInt8) || math.IsNaN(floatVal) || math.IsInf(floatVal, 0) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "time.Duration",
         "to_type":   "int8",
         "value":     val,
       })
-      dst = 0
     }
-    return
+    return int8(floatVal), nil
   default:
     return 0, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
       "src":      val,
@@ -1003,14 +1062,49 @@ func Uint64(src any) (dst uint64, err zerror.Error) {
   case uint64:
     return val, nil
   case int:
+    if val < 0 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "int",
+        "to_type":   "uint64",
+        "value":     val,
+      })
+    }
     return uint64(val), nil
   case int8:
+    if val < 0 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "int8",
+        "to_type":   "uint64",
+        "value":     val,
+      })
+    }
     return uint64(val), nil
   case int16:
+    if val < 0 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "int16",
+        "to_type":   "uint64",
+        "value":     val,
+      })
+    }
     return uint64(val), nil
   case int32:
+    if val < 0 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "int32",
+        "to_type":   "uint64",
+        "value":     val,
+      })
+    }
     return uint64(val), nil
   case int64:
+    if val < 0 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "int64",
+        "to_type":   "uint64",
+        "value":     val,
+      })
+    }
     return uint64(val), nil
   case uint:
     return uint64(val), nil
@@ -1021,14 +1115,79 @@ func Uint64(src any) (dst uint64, err zerror.Error) {
   case uint32:
     return uint64(val), nil
   case float32:
+    if math.IsNaN(float64(val)) || math.IsInf(float64(val), 0) || val < 0 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "float32",
+        "to_type":   "uint64",
+        "value":     val,
+      })
+    }
+    if val > float32(math.MaxUint64) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "float32",
+        "to_type":   "uint64",
+        "value":     val,
+      })
+    }
     return uint64(val), nil
   case float64:
+    if math.IsNaN(val) || math.IsInf(val, 0) || val < 0 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "float64",
+        "to_type":   "uint64",
+        "value":     val,
+      })
+    }
+    if val > float64(^uint64(0)) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "float64",
+        "to_type":   "uint64",
+        "value":     val,
+      })
+    }
     return uint64(val), nil
   case complex64:
-    return uint64(real(val)), nil
+    realVal := real(val)
+    if math.IsNaN(float64(realVal)) || math.IsInf(float64(realVal), 0) || realVal < 0 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "complex64",
+        "to_type":   "uint64",
+        "value":     val,
+      })
+    }
+    if realVal > float32(^uint64(0)) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "complex64",
+        "to_type":   "uint64",
+        "value":     val,
+      })
+    }
+    return uint64(realVal), nil
   case complex128:
-    return uint64(real(val)), nil
+    realVal := real(val)
+    if math.IsNaN(realVal) || math.IsInf(realVal, 0) || realVal < 0 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "complex128",
+        "to_type":   "uint64",
+        "value":     val,
+      })
+    }
+    if realVal > float64(^uint64(0)) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "complex128",
+        "to_type":   "uint64",
+        "value":     val,
+      })
+    }
+    return uint64(realVal), nil
   case time.Duration:
+    if val < 0 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "time.Duration",
+        "to_type":   "uint64",
+        "value":     val,
+      })
+    }
     return uint64(val), nil
   case time.Time: // return the unix value
     return uint64(val.Unix()), nil
@@ -1038,27 +1197,53 @@ func Uint64(src any) (dst uint64, err zerror.Error) {
     }
     return 0, nil
   case []byte:
-    floatVal, err := strconv.ParseFloat(string(val), 64)
+    // First try parsing as integer
+    intVal, err := strconv.ParseUint(string(val), 10, 64)
     if err != nil {
-      return 0, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
-        "src":      val,
-        "src_type": "[]byte",
-        "dst_type": "uint64",
-        "error":    err.Error(),
-      })
+      // If not an integer, try parsing as float
+      floatVal, ferr := strconv.ParseFloat(string(val), 64)
+      if ferr != nil {
+        return 0, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
+          "src":      val,
+          "src_type": "[]byte",
+          "dst_type": "uint64",
+          "error":    err.Error(),
+        })
+      }
+      if floatVal < 0 || floatVal > float64(^uint64(0)) || math.IsNaN(floatVal) || math.IsInf(floatVal, 0) {
+        return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+          "from_type": "[]byte",
+          "to_type":   "uint64",
+          "value":     val,
+        })
+      }
+      return uint64(floatVal), nil
     }
-    return uint64(floatVal), nil
+    return intVal, nil
   case string:
-    floatVal, err := strconv.ParseFloat(val, 64)
+    // First try parsing as integer
+    intVal, err := strconv.ParseUint(val, 10, 64)
     if err != nil {
-      return 0, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
-        "src":      val,
-        "src_type": "string",
-        "dst_type": "uint64",
-        "error":    err.Error(),
-      })
+      // If not an integer, try parsing as float
+      floatVal, ferr := strconv.ParseFloat(val, 64)
+      if ferr != nil {
+        return 0, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
+          "src":      val,
+          "src_type": "string",
+          "dst_type": "uint64",
+          "error":    err.Error(),
+        })
+      }
+      if floatVal < 0 || floatVal > float64(^uint64(0)) || math.IsNaN(floatVal) || math.IsInf(floatVal, 0) {
+        return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+          "from_type": "string",
+          "to_type":   "uint64",
+          "value":     val,
+        })
+      }
+      return uint64(floatVal), nil
     }
-    return uint64(floatVal), nil
+    return intVal, nil
   default:
     return 0, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
       "src":      val,
@@ -1196,26 +1381,64 @@ func Uint32(src any) (dst uint32, err zerror.Error) {
     }
     return uint32(realVal), nil
   case time.Duration:
-    return uint32(val), nil
+    ival := int64(val)
+    if ival < 0 || ival > math.MaxUint32 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "time.Duration",
+        "to_type":   "uint32",
+        "value":     val,
+      })
+    }
+    return uint32(ival), nil
   case time.Time: // return the unix value
-    return uint32(val.Unix()), nil
+    unixTime := val.Unix()
+    if unixTime < 0 || unixTime > math.MaxUint32 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "time.Time",
+        "to_type":   "uint32",
+        "value":     unixTime,
+      })
+    }
+    return uint32(unixTime), nil
   case bool:
     if val {
       return 1, nil
     }
     return 0, nil
   case []byte:
+    // First try parsing as uint64
+    if uintVal, err := strconv.ParseUint(string(val), 10, 32); err == nil {
+      return uint32(uintVal), nil
+    }
+
+    // If that fails, try parsing as float
     floatVal, err := strconv.ParseFloat(string(val), 64)
     if err != nil {
       return 0, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
-        "src":      val,
+        "src":      string(val),
         "src_type": "[]byte",
         "dst_type": "uint32",
         "error":    err.Error(),
       })
     }
+
+    // Check for overflow, NaN, and negative values
+    if math.IsNaN(floatVal) || math.IsInf(floatVal, 0) || floatVal < 0 || floatVal > math.MaxUint32 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "[]byte",
+        "to_type":   "uint32",
+        "value":     string(val),
+      })
+    }
+
     return uint32(floatVal), nil
   case string:
+    // First try parsing as uint64
+    if uintVal, err := strconv.ParseUint(val, 10, 32); err == nil {
+      return uint32(uintVal), nil
+    }
+
+    // If that fails, try parsing as float
     floatVal, err := strconv.ParseFloat(val, 64)
     if err != nil {
       return 0, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
@@ -1225,6 +1448,16 @@ func Uint32(src any) (dst uint32, err zerror.Error) {
         "error":    err.Error(),
       })
     }
+
+    // Check for overflow, NaN, and negative values
+    if math.IsNaN(floatVal) || math.IsInf(floatVal, 0) || floatVal < 0 || floatVal > math.MaxUint32 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "string",
+        "to_type":   "uint32",
+        "value":     val,
+      })
+    }
+
     return uint32(floatVal), nil
   default:
     return 0, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
@@ -1370,26 +1603,64 @@ func Uint16(src any) (dst uint16, err zerror.Error) {
     }
     return uint16(realVal), nil
   case time.Duration:
-    return uint16(val), nil
+    ival := int64(val)
+    if ival < 0 || ival > math.MaxUint16 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "time.Duration",
+        "to_type":   "uint16",
+        "value":     val,
+      })
+    }
+    return uint16(ival), nil
   case time.Time: // return the unix value
-    return uint16(val.Unix()), nil
+    unixTime := val.Unix()
+    if unixTime < 0 || unixTime > math.MaxUint16 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "time.Time",
+        "to_type":   "uint16",
+        "value":     unixTime,
+      })
+    }
+    return uint16(unixTime), nil
   case bool:
     if val {
       return 1, nil
     }
     return 0, nil
   case []byte:
+    // First try parsing as uint64
+    if uintVal, err := strconv.ParseUint(string(val), 10, 16); err == nil {
+      return uint16(uintVal), nil
+    }
+
+    // If that fails, try parsing as float
     floatVal, err := strconv.ParseFloat(string(val), 64)
     if err != nil {
       return 0, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
-        "src":      val,
+        "src":      string(val),
         "src_type": "[]byte",
         "dst_type": "uint16",
         "error":    err.Error(),
       })
     }
+
+    // Check for overflow, NaN, and negative values
+    if math.IsNaN(floatVal) || math.IsInf(floatVal, 0) || floatVal < 0 || floatVal > math.MaxUint16 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "[]byte",
+        "to_type":   "uint16",
+        "value":     string(val),
+      })
+    }
+
     return uint16(floatVal), nil
   case string:
+    // First try parsing as uint64
+    if uintVal, err := strconv.ParseUint(val, 10, 16); err == nil {
+      return uint16(uintVal), nil
+    }
+
+    // If that fails, try parsing as float
     floatVal, err := strconv.ParseFloat(val, 64)
     if err != nil {
       return 0, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
@@ -1399,6 +1670,16 @@ func Uint16(src any) (dst uint16, err zerror.Error) {
         "error":    err.Error(),
       })
     }
+
+    // Check for overflow, NaN, and negative values
+    if math.IsNaN(floatVal) || math.IsInf(floatVal, 0) || floatVal < 0 || floatVal > math.MaxUint16 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "string",
+        "to_type":   "uint16",
+        "value":     val,
+      })
+    }
+
     return uint16(floatVal), nil
   default:
     return 0, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
@@ -1551,26 +1832,64 @@ func Uint8(src any) (dst uint8, err zerror.Error) {
     }
     return uint8(realVal), nil
   case time.Duration:
-    return uint8(val), nil
+    ival := int64(val)
+    if ival < 0 || ival > math.MaxUint8 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "time.Duration",
+        "to_type":   "uint8",
+        "value":     val,
+      })
+    }
+    return uint8(ival), nil
   case time.Time: // return the unix value
-    return uint8(val.Unix()), nil
+    unixTime := val.Unix()
+    if unixTime < 0 || unixTime > math.MaxUint8 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "time.Time",
+        "to_type":   "uint8",
+        "value":     unixTime,
+      })
+    }
+    return uint8(unixTime), nil
   case bool:
     if val {
       return 1, nil
     }
     return 0, nil
   case []byte:
+    // First try parsing as uint64
+    if uintVal, err := strconv.ParseUint(string(val), 10, 8); err == nil {
+      return uint8(uintVal), nil
+    }
+
+    // If that fails, try parsing as float
     floatVal, err := strconv.ParseFloat(string(val), 64)
     if err != nil {
       return 0, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
-        "src":      val,
+        "src":      string(val),
         "src_type": "[]byte",
         "dst_type": "uint8",
         "error":    err.Error(),
       })
     }
+
+    // Check for overflow, NaN, and negative values
+    if math.IsNaN(floatVal) || math.IsInf(floatVal, 0) || floatVal < 0 || floatVal > math.MaxUint8 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "[]byte",
+        "to_type":   "uint8",
+        "value":     string(val),
+      })
+    }
+
     return uint8(floatVal), nil
   case string:
+    // First try parsing as uint64
+    if uintVal, err := strconv.ParseUint(val, 10, 8); err == nil {
+      return uint8(uintVal), nil
+    }
+
+    // If that fails, try parsing as float
     floatVal, err := strconv.ParseFloat(val, 64)
     if err != nil {
       return 0, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
@@ -1580,6 +1899,16 @@ func Uint8(src any) (dst uint8, err zerror.Error) {
         "error":    err.Error(),
       })
     }
+
+    // Check for overflow, NaN, and negative values
+    if math.IsNaN(floatVal) || math.IsInf(floatVal, 0) || floatVal < 0 || floatVal > math.MaxUint8 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "string",
+        "to_type":   "uint8",
+        "value":     val,
+      })
+    }
+
     return uint8(floatVal), nil
   default:
     return 0, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
@@ -1607,6 +1936,15 @@ func Float64(src any) (dst float64, err zerror.Error) {
   case int32:
     return float64(val), nil
   case int64:
+    // Check for potential precision loss when converting from int64 to float64
+    // 1<<53 (2^53) is the largest integer that can be exactly represented in a float64 (IEEE 754 double-precision)
+    if val > int64(1<<53) || val < -int64(1<<53) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "int64",
+        "to_type":   "float64",
+        "value":     val,
+      })
+    }
     return float64(val), nil
   case uint:
     return float64(val), nil
@@ -1617,8 +1955,24 @@ func Float64(src any) (dst float64, err zerror.Error) {
   case uint32:
     return float64(val), nil
   case uint64:
+    // Check for potential precision loss when converting from uint64 to float64
+    // 1<<53 is the largest integer that can be exactly represented in a float64 (IEEE 754 double-precision)
+    if val > uint64(1<<53) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "uint64",
+        "to_type":   "float64",
+        "value":     val,
+      })
+    }
     return float64(val), nil
   case float32:
+    if math.IsNaN(float64(val)) || math.IsInf(float64(val), 0) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "float32",
+        "to_type":   "float64",
+        "value":     val,
+      })
+    }
     return float64(val), nil
   case complex64:
     realVal := real(val)
@@ -1653,10 +2007,17 @@ func Float64(src any) (dst float64, err zerror.Error) {
     floatValue, err := strconv.ParseFloat(string(val), 64)
     if err != nil {
       return 0, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
-        "src":      val,
+        "src":      string(val),
         "src_type": "[]byte",
         "dst_type": "float64",
         "error":    err.Error(),
+      })
+    }
+    if math.IsNaN(floatValue) || math.IsInf(floatValue, 0) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "[]byte",
+        "to_type":   "float64",
+        "value":     string(val),
       })
     }
     return floatValue, nil
@@ -1668,6 +2029,13 @@ func Float64(src any) (dst float64, err zerror.Error) {
         "src_type": "string",
         "dst_type": "float64",
         "error":    err.Error(),
+      })
+    }
+    if math.IsNaN(floatValue) || math.IsInf(floatValue, 0) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "string",
+        "to_type":   "float64",
+        "value":     val,
       })
     }
     return floatValue, nil
@@ -1697,6 +2065,15 @@ func Float32(src any) (dst float32, err zerror.Error) {
   case int32:
     return float32(val), nil
   case int64:
+    // Check for potential precision loss when converting from int64 to float32
+    // 1<<24 is the largest integer that can be exactly represented in a float32 (IEEE 754 single-precision)
+    if val > int64(1<<24) || val < -int64(1<<24) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "int64",
+        "to_type":   "float32",
+        "value":     val,
+      })
+    }
     return float32(val), nil
   case uint:
     return float32(val), nil
@@ -1707,8 +2084,24 @@ func Float32(src any) (dst float32, err zerror.Error) {
   case uint32:
     return float32(val), nil
   case uint64:
+    // Check for potential precision loss when converting from uint64 to float32
+    // 1<<24 is the largest integer that can be exactly represented in a float32 (IEEE 754 single-precision)
+    if val > uint64(1<<24) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "uint64",
+        "to_type":   "float32",
+        "value":     val,
+      })
+    }
     return float32(val), nil
   case float64:
+    if math.IsNaN(val) || math.IsInf(val, 0) || val > math.MaxFloat32 || val < -math.MaxFloat32 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "float64",
+        "to_type":   "float32",
+        "value":     val,
+      })
+    }
     return float32(val), nil
   case complex64:
     realVal := real(val)
@@ -1747,24 +2140,40 @@ func Float32(src any) (dst float32, err zerror.Error) {
     }
     return 0, nil
   case []byte:
-    floatVal, err := strconv.ParseFloat(string(val), 64)
+    floatVal, err := strconv.ParseFloat(string(val), 32)
     if err != nil {
       return 0, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
-        "src":      val,
+        "src":      string(val),
         "src_type": "[]byte",
         "dst_type": "float32",
         "error":    err.Error(),
       })
     }
+    // Check for overflow, NaN, and Inf after parsing
+    if math.IsNaN(floatVal) || math.IsInf(floatVal, 0) || floatVal > math.MaxFloat32 || floatVal < -math.MaxFloat32 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "[]byte",
+        "to_type":   "float32",
+        "value":     string(val),
+      })
+    }
     return float32(floatVal), nil
   case string:
-    floatVal, err := strconv.ParseFloat(string(val), 64)
+    floatVal, err := strconv.ParseFloat(val, 32)
     if err != nil {
       return 0, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
         "src":      val,
         "src_type": "string",
         "dst_type": "float32",
         "error":    err.Error(),
+      })
+    }
+    // Check for overflow, NaN, and Inf after parsing
+    if math.IsNaN(floatVal) || math.IsInf(floatVal, 0) || floatVal > math.MaxFloat32 || floatVal < -math.MaxFloat32 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "string",
+        "to_type":   "float32",
+        "value":     val,
       })
     }
     return float32(floatVal), nil
@@ -1794,7 +2203,15 @@ func Complex64(src any) (dst complex64, err zerror.Error) {
   case int32:
     return complex(float32(val), float32(0)), nil
   case int64:
-    return complex(float32(val), float32(0)), nil // there may be some conversion loss here
+    // Check for potential overflow when converting from int64 to float32
+    if val > int64(1<<24) || val < -int64(1<<24) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "int64",
+        "to_type":   "complex64",
+        "value":     val,
+      })
+    }
+    return complex(float32(val), float32(0)), nil
   case uint:
     return complex(float32(val), float32(0)), nil
   case uint8:
@@ -1804,13 +2221,40 @@ func Complex64(src any) (dst complex64, err zerror.Error) {
   case uint32:
     return complex(float32(val), float32(0)), nil
   case uint64:
-    return complex(float32(val), float32(0)), nil // there may be some conversion loss here
+    // Check for potential overflow when converting from uint64 to float32
+    if val > uint64(1<<24) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "uint64",
+        "to_type":   "complex64",
+        "value":     val,
+      })
+    }
+    return complex(float32(val), float32(0)), nil
   case float32:
     return complex(val, float32(0)), nil
   case float64:
-    return complex(float32(val), float32(0)), nil // there may be some conversion loss here
+    // Check for overflow, NaN, and Inf when converting from float64 to float32
+    if math.IsNaN(val) || math.IsInf(val, 0) || val > math.MaxFloat32 || val < -math.MaxFloat32 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "float64",
+        "to_type":   "complex64",
+        "value":     val,
+      })
+    }
+    return complex(float32(val), float32(0)), nil
   case complex128:
-    return complex64(val), nil // there may be some conversion loss here
+    // Check for overflow, NaN, and Inf in both real and imaginary parts
+    realVal := real(val)
+    imagVal := imag(val)
+    if math.IsNaN(realVal) || math.IsInf(realVal, 0) || realVal > math.MaxFloat32 || realVal < -math.MaxFloat32 ||
+      math.IsNaN(imagVal) || math.IsInf(imagVal, 0) || imagVal > math.MaxFloat32 || imagVal < -math.MaxFloat32 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "complex128",
+        "to_type":   "complex64",
+        "value":     val,
+      })
+    }
+    return complex64(val), nil
   case time.Duration:
     return complex(float32(val), float32(0)), nil
   case time.Time: // return the unix value
@@ -1824,10 +2268,21 @@ func Complex64(src any) (dst complex64, err zerror.Error) {
     complexVal, err := strconv.ParseComplex(string(val), 64)
     if err != nil {
       return 0, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
-        "src":      val,
+        "src":      string(val),
         "src_type": "[]byte",
         "dst_type": "complex64",
         "error":    err.Error(),
+      })
+    }
+    // Check for overflow in the parsed complex value
+    realVal := real(complexVal)
+    imagVal := imag(complexVal)
+    if math.IsNaN(realVal) || math.IsInf(realVal, 0) || realVal > math.MaxFloat32 || realVal < -math.MaxFloat32 ||
+      math.IsNaN(imagVal) || math.IsInf(imagVal, 0) || imagVal > math.MaxFloat32 || imagVal < -math.MaxFloat32 {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "[]byte",
+        "to_type":   "complex64",
+        "value":     string(val),
       })
     }
     return complex64(complexVal), nil
@@ -1868,6 +2323,15 @@ func Complex128(src any) (dst complex128, err zerror.Error) {
   case int32:
     return complex(float64(val), float64(0)), nil
   case int64:
+    // Check for potential precision loss when converting from int64 to float64
+    // 1<<53 is the largest integer that can be exactly represented in a float64
+    if val > int64(1<<53) || val < -int64(1<<53) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "int64",
+        "to_type":   "complex128",
+        "value":     val,
+      })
+    }
     return complex(float64(val), float64(0)), nil
   case uint:
     return complex(float64(val), float64(0)), nil
@@ -1878,12 +2342,22 @@ func Complex128(src any) (dst complex128, err zerror.Error) {
   case uint32:
     return complex(float64(val), float64(0)), nil
   case uint64:
+    // Check for potential precision loss when converting from uint64 to float64
+    // 1<<53 is the largest integer that can be exactly represented in a float64
+    if val > uint64(1<<53) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "uint64",
+        "to_type":   "complex128",
+        "value":     val,
+      })
+    }
     return complex(float64(val), float64(0)), nil
   case float32:
     return complex(float64(val), float64(0)), nil
   case float64:
     return complex(val, float64(0)), nil
   case complex64:
+    // No overflow possible when converting from complex64 to complex128
     return complex128(val), nil // there may be some conversion loss here
   case time.Duration:
     return complex(float64(val), float64(0)), nil
@@ -1898,10 +2372,20 @@ func Complex128(src any) (dst complex128, err zerror.Error) {
     complexVal, err := strconv.ParseComplex(string(val), 128)
     if err != nil {
       return 0, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
-        "src":      val,
+        "src":      string(val),
         "src_type": "[]byte",
         "dst_type": "complex128",
         "error":    err.Error(),
+      })
+    }
+    // Check for NaN and Inf in the parsed complex value
+    realVal := real(complexVal)
+    imagVal := imag(complexVal)
+    if math.IsNaN(realVal) || math.IsInf(realVal, 0) || math.IsNaN(imagVal) || math.IsInf(imagVal, 0) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "[]byte",
+        "to_type":   "complex128",
+        "value":     string(val),
       })
     }
     return complexVal, nil
@@ -1913,6 +2397,16 @@ func Complex128(src any) (dst complex128, err zerror.Error) {
         "src_type": "string",
         "dst_type": "complex128",
         "error":    err.Error(),
+      })
+    }
+    // Check for NaN and Inf in the parsed complex value
+    realVal := real(complexVal)
+    imagVal := imag(complexVal)
+    if math.IsNaN(realVal) || math.IsInf(realVal, 0) || math.IsNaN(imagVal) || math.IsInf(imagVal, 0) {
+      return 0, zerror.New(ErrorConvertorNumberOverflow, map[string]any{
+        "from_type": "string",
+        "to_type":   "complex128",
+        "value":     val,
       })
     }
     return complexVal, nil
@@ -1971,8 +2465,16 @@ func Decimal(src any) (dst decimal.Decimal, err zerror.Error) {
     }
     return decimal.NewFromInt(0), nil
   case []byte:
-    floatval, _ := strconv.ParseFloat(string(val), 64)
-    return decimal.NewFromFloat(floatval), nil
+    decval, er := decimal.NewFromString(string(val))
+    if er != nil {
+      err = zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
+        "error":    er.Error(),
+        "src":      val,
+        "src_type": reflect.TypeOf(val).String(),
+        "dst_type": "decimal",
+      })
+    }
+    return decval, err
   case string:
     decval, er := decimal.NewFromString(val)
     if er != nil {
@@ -2035,7 +2537,8 @@ func String(src any) (dst string, err zerror.Error) {
   case uint64:
     return strconv.FormatUint(val, 10), nil
   case time.Duration:
-    return strconv.FormatUint(uint64(val), 10), nil
+    return val.String(), nil
+    // return strconv.FormatInt(int64(val), 10), nil
   case float32:
     return strconv.FormatFloat(float64(val), 'g', -1, 64), nil
   case float64:
@@ -2046,6 +2549,8 @@ func String(src any) (dst string, err zerror.Error) {
     return strconv.FormatComplex(val, 'g', -1, 128), nil
   case time.Time: // return the standard ISO STZ format
     return val.Format(TimeFormatISOSTZ), nil
+  case decimal.Decimal:
+    return val.String(), nil
   case Stringable:
     return val.String(), nil
   case ToStringable:
@@ -2082,11 +2587,11 @@ func Bool(src any) (dst bool, err zerror.Error) {
     }
     return true, nil
   case string:
-    stringVal := strings.ToLower(val)
-    if stringVal == "" || stringVal == "false" { // element is empty or "false"
+    tst, er := strconv.ParseBool(val)
+    if er != nil {
       return false, nil
     }
-    return true, nil
+    return tst, nil
   default:
     return false, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
       "src":      val,
@@ -2279,6 +2784,7 @@ func SliceInt(src any) (dst []int, err zerror.Error) {
       return result, err
     }
     result = append(result, resInt)
+    return result, nil
   }
   return result, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
     "src":      src,
@@ -2313,8 +2819,21 @@ func SliceMapStringAny(src any) (dst []map[string]any, err zerror.Error) {
           return result, err
         }
         result = append(result, res)
+      default:
+        return result, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
+          "src":      elem,
+          "src_type": elemKind.String(),
+          "dst_type": "map[string]any",
+        })
       }
     }
+    return result, nil
+  } else if srcKind == reflect.Map || srcKind == reflect.Struct {
+    res, err := MapStringAny(src)
+    if err != nil {
+      return result, err
+    }
+    result = append(result, res)
     return result, nil
   }
   return result, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
@@ -2329,11 +2848,13 @@ func SliceMapStringAny(src any) (dst []map[string]any, err zerror.Error) {
 // params:
 //
 //	src
-//	   1 - string     - will try parse the string and returns appropriate value (see code for supported RFC and ISO formats)
-//	   1,2 - number   - (int, uint, float types) - will be converted to integers and assumes unix time and/or unixnano time
-//	   7 numbers      - time.Date(year, time.Month(month), day, hour, min, sec, nsec)
-//	   time.Time      - returns value as is
-//	   other          - will return an error
+//	   1 - string                - will try parse the string and returns appropriate value (see code for supported RFC and ISO formats)
+//	   1,2 - number              - (int, uint, float types) - will be converted to integers and assumes unix time and/or unixnano time
+//	   7 numbers                 - time.Date(year, time.Month(month), day, hour, min, sec, nsec, time.UTC)
+//	   7 numbers + location      - time.Date(year, time.Month(month), day, hour, min, sec, nsec, location), uses time.UTC if location is nil
+//	   time.Time                 - returns value as is
+//     time.Duration             - returns
+//	   other                     - will return an error
 func Time(args ...any) (dst time.Time, err zerror.Error) {
   result := time.Time{}
   if len(args) == 0 {
@@ -2344,6 +2865,12 @@ func Time(args ...any) (dst time.Time, err zerror.Error) {
     }
     if timeVal, ok := args[0].(time.Time); ok {
       return timeVal, nil
+    }
+    if timeVal, ok := args[0].(time.Duration); ok {
+      return time.Unix(0, timeVal.Nanoseconds()), nil
+    }
+    if timeVal, ok := args[0].([]byte); ok {
+      return Time(string(timeVal))
     }
     // checking other types
     elemKind := reflect.TypeOf(args[0]).Kind()
@@ -2370,6 +2897,7 @@ func Time(args ...any) (dst time.Time, err zerror.Error) {
         })
         err.Add(zer.GetList())
       }
+
       // we try to match one of the supported time formats
       result, er := time.Parse(time.RFC822, timeStr)
       if er != nil {
@@ -2465,7 +2993,7 @@ func Time(args ...any) (dst time.Time, err zerror.Error) {
       return result, err
     }
     result = time.Unix(unixTime, unixNano)
-  } else if len(args) == 7 { // assuming 7 integers, no location
+  } else if len(args) == 7 { // assuming 7 integers, no location, will default location to UTC
     year, err := Int(args[0])
     if err != nil {
       return result, err
@@ -2494,7 +3022,42 @@ func Time(args ...any) (dst time.Time, err zerror.Error) {
     if err != nil {
       return result, err
     }
-    var location *time.Location // will remain nil
+    result = time.Date(year, time.Month(month), day, hour, min, sec, nsec, time.UTC)
+  } else if len(args) == 8 { // assuming 7 integers and location, if location is nil it will use time.UTC
+    year, err := Int(args[0])
+    if err != nil {
+      return result, err
+    }
+    month, err := Int(args[1])
+    if err != nil {
+      return result, err
+    }
+    day, err := Int(args[2])
+    if err != nil {
+      return result, err
+    }
+    hour, err := Int(args[3])
+    if err != nil {
+      return result, err
+    }
+    min, err := Int(args[4])
+    if err != nil {
+      return result, err
+    }
+    sec, err := Int(args[5])
+    if err != nil {
+      return result, err
+    }
+    nsec, err := Int(args[6])
+    if err != nil {
+      return result, err
+    }
+
+    locationItf := args[7]
+    location, ok := locationItf.(*time.Location)
+    if !ok {
+      location = time.UTC
+    }
     result = time.Date(year, time.Month(month), day, hour, min, sec, nsec, location)
   } else {
     return result, zerror.New(ErrorConvertorTypeNotSupported, map[string]any{
