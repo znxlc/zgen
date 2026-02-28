@@ -2035,3 +2035,20 @@ func TestUnit_Time(t *testing.T) {
 		}
 	})
 }
+
+// Helper functions for creating pointers
+func intPtr(i int) *int {
+	return &i
+}
+
+func stringPtr(s string) *string {
+	return &s
+}
+
+func boolPtr(b bool) *bool {
+	return &b
+}
+
+func anyPtr(a any) *any {
+	return &a
+}
