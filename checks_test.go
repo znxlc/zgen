@@ -99,7 +99,7 @@ func TestUnit_IsNumber(t *testing.T) {
 		{name: "binary string", input: "0b1010", expected: false}, // Float64 conversion will fail
 
 		// Decimal type
-		{name: "decimal.Decimal", input: decimal.NewFromInt(123), expected: false}, // Not in direct types, Float64 conversion fails
+		{name: "decimal.Decimal", input: decimal.NewFromInt(123), expected: true}, // Float64/Int now support decimal.Decimal
 	}
 
 	for _, tt := range tests {
