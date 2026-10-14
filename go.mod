@@ -1,6 +1,6 @@
 module github.com/znxlc/zgen
 
-go 1.25.5
+go 1.27.1
 
 require (
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
@@ -8,7 +8,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/shopspring/decimal v1.3.1
 	github.com/stretchr/testify v1.8.4
-	github.com/znxlc/zerror v0.1.1
+	github.com/znxlc/zerror v0.1.4
 )
 
 require (
